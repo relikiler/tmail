@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TMAIL - Encrypted Web3 Email</title>
+    <meta name="description" content="Encrypted, wallet-based email. No ads, no data selling. Powered by TMAIL token on Polygon.">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#8b5cf6">
+    
+    <!-- Шрифты -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            --bg-primary: #09090b;
+            --bg-secondary: #18181b;
+            --bg-card: rgba(24, 24, 27, 0.7);
+            --text-main: #fafafa;
+            --text-muted: #a1a1aa;
+            --accent: #8b5cf6; /* Violet/Purple for Web3 vibe */
+            --accent-hover: #7c3aed;
+            --border: #27272a;
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
+        /* --- UTILITIES --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .section {
+            padding: 100px 0;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #fff, #a1a1aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 3rem auto;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* --- HEADER / NAV --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(9, 9, 11, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo span { color: var(--accent); }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover { color: var(--text-main); }
+
+        /* Language Switcher */
+        .lang-switcher {
+            display: flex;
+            gap: 8px;
+            background: var(--bg-secondary);
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .lang-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .lang-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* --- HERO --- */
+        .hero {
+            padding-top: 160px;
+            padding-bottom: 100px;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, rgba(9,9,11,0) 70%);
+            z-index: -1;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            letter-spacing: -1.5px;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 650px;
+            margin: 0 auto 40px auto;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+
+        /* --- FEATURES --- */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 16px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* --- HOW IT WORKS --- */
+        .steps-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+            position: relative;
+        }
+
+        .steps-container::before {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: 15%;
+            width: 70%;
+            height: 2px;
+            background: linear-gradient(to right, var(--border), var(--accent), var(--border));
+            z-index: 0;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-number {
+            width: 80px;
+            height: 80px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0 auto 20px auto;
+            color: var(--accent);
+        }
+
+        .step h3 { margin-bottom: 10px; }
+        .step p { color: var(--text-muted); font-size: 0.9rem; }
+
+        /* --- TOKEN --- */
+        .token-section {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .token-content {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+        }
+
+        .token-text { flex: 1; }
+        .token-graphic { 
+            flex: 1; 
+            display: flex; 
+            justify-content: center;
+            font-size: 8rem;
+            opacity: 0.8;
+        }
+
+        .token-text h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .token-text p {
+            color: var(--text-muted);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--accent);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        /* --- PRICING --- */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .pricing-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 40px 30px;
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .pricing-card.popular {
+            border-color: var(--accent);
+            transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.15);
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: white;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .pricing-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .price {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 20px 0;
+            color: var(--text-main);
+        }
+
+        .price span {
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--text-muted);
+        }
+
+        .pricing-features {
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .pricing-features li {
+            margin-bottom: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pricing-features li::before {
+            content: '✓';
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* --- ROADMAP --- */
+        .roadmap-list {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .roadmap-list::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+
+        .roadmap-item {
+            position: relative;
+            margin-bottom: 40px;
+            padding-left: 30px;
+        }
+
+        .roadmap-item::before {
+            content: '';
+            position: absolute;
+            left: -31px;
+            top: 5px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--bg-primary);
+            border: 3px solid var(--accent);
+        }
+
+        .roadmap-item.completed::before {
+            background: var(--accent);
+        }
+
+        .roadmap-item h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
+
+        .roadmap-item p {
+            color: var(--text-muted);
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            padding: 60px 0 30px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-about p {
+            color: var(--text-muted);
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+
+        .footer-links h4 {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .footer-links a {
+            display: block;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover { color: var(--accent); }
+
+        .footer-bottom {
+            border-top: 1px solid var(--border);
+            padding-top: 30px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* --- ANIMATIONS --- */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .nav-links { display: none; } /* В реальном проекте добавить бургер-меню */
+            .steps-container { flex-direction: column; align-items: center; }
+            .steps-container::before { display: none; }
+            .token-content { flex-direction: column; text-align: center; }
+            .pricing-card.popular { transform: scale(1); }
+            .footer-grid { grid-template-columns: 1fr; }
+            .hero-buttons { flex-direction: column; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <nav class="container">
+            <div class="logo">T<span>MAIL</span></div>
+            <ul class="nav-links">
+                <li><a href="#features" data-i18n="nav_features">Features</a></li>
+                <li><a href="#how-it-works" data-i18n="nav_how">How it works</a></li>
+                <li><a href="#pricing" data-i18n="nav_pricing">Pricing</a></li>
+                <li><a href="#roadmap" data-i18n="nav_roadmap">Roadmap</a></li>
+                <li>
+                    <div class="lang-switcher">
+                        <button class="lang-btn active" onclick="changeLanguage('en')">EN</button>
+                        <button class="lang-btn" onclick="changeLanguage('ru')">RU</button>
+                        <button class="lang-btn" onclick="changeLanguage('de')">DE</button>
+                        <button class="lang-btn" onclick="changeLanguage('fr')">FR</button>
+                    </div>
+                </li>
+                <li><a href="#" class="btn btn-primary" data-i18n="nav_launch">Launch App</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero container fade-in">
+        <h1 data-i18n="hero_title">Private. Encrypted.<br>Web3 Native.</h1>
+        <p data-i18n="hero_desc">The email service built for the decentralized era. Wallet login, client-side encryption, zero ads, and absolutely no data selling. Your keys, your emails.</p>
+        <div class="hero-buttons">
+            <a href="https://195.209.212.237.nip.io/app" class="btn btn-primary" data-i18n="hero_btn_start">Connect Wallet & Start</a>
+            <a href="#how-it-works" class="btn btn-outline" data-i18n="hero_btn_learn">Learn More</a>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features" class="section container">
+        <h2 class="section-title fade-in" data-i18n="feat_title">Built Different</h2>
+        <p class="section-subtitle fade-in" data-i18n="feat_desc">We stripped away everything that makes modern email terrible, and added what actually matters.</p>
+        
+        <div class="features-grid">
+            <div class="feature-card fade-in">
+                <div class="feature-icon">🔐</div>
+                <h3 data-i18n="f1_title">End-to-End Encryption</h3>
+                <p data-i18n="f1_desc">Client-side cryptography ensures that only you and your recipient can read your messages. Not even we can see them.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">🦊</div>
+                <h3 data-i18n="f2_title">Wallet Login</h3>
+                <p data-i18n="f2_desc">No passwords to forget. Authenticate seamlessly using MetaMask, WalletConnect, or any Web3 wallet.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">🚫</div>
+                <h3 data-i18n="f3_title">Zero Ads & Tracking</h3>
+                <p data-i18n="f3_desc">We don't sell your data. We don't show you ads. Ever. Our business model is based on utility, not surveillance.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">✨</div>
+                <h3 data-i18n="f4_title">Generous Free Plan</h3>
+                <p data-i18n="f4_desc">Send up to 7 encrypted emails per day completely free. Upgrade only when you need more power.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section id="how-it-works" class="section container" style="background: var(--bg-secondary); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); max-width: 100%; padding-left: 24px; padding-right: 24px;">
+        <div class="container">
+            <h2 class="section-title fade-in" data-i18n="how_title">How It Works</h2>
+            <p class="section-subtitle fade-in" data-i18n="how_desc">Three simple steps to secure communication.</p>
+            
+            <div class="steps-container fade-in">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3 data-i18n="s1_title">Register</h3>
+                    <p data-i18n="s1_desc">Connect your Web3 wallet. Your address becomes your identity. No personal info required.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3 data-i18n="s2_title">Encrypt</h3>
+                    <p data-i18n="s2_desc">Compose your message. Client-side crypto locks it down before it ever leaves your browser.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3 data-i18n="s3_title">Send</h3>
+                    <p data-i18n="s3_desc">Transmit securely over our decentralized infrastructure. Only the holder of the destination key can decrypt.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TOKEN -->
+    <section id="token" class="section token-section">
+        <div class="container token-content fade-in">
+            <div class="token-text">
+                <div class="badge" data-i18n="tok_badge">Polygon Network</div>
+                <h2 data-i18n="tok_title">Powered by $TMAIL</h2>
+                <p data-i18n="tok_p1">TMAIL is the native utility token of our ecosystem. Premium subscriptions are paid exclusively in TMAIL, creating a closed-loop, community-owned economy.</p>
+                <p data-i18n="tok_p2"><strong>Anti-Whale Protection:</strong> Smart contracts enforce holding limits and transaction caps to prevent market manipulation and ensure fair distribution.</p>
+            </div>
+            <div class="token-graphic">🪙</div>
+        </div>
+    </section>
+
+    <!-- PRICING -->
+    <section id="pricing" class="section container">
+        <h2 class="section-title fade-in" data-i18n="pr_title">Simple Pricing</h2>
+        <p class="section-subtitle fade-in" data-i18n="pr_desc">Start for free. Scale with crypto.</p>
+
+        <div class="pricing-grid fade-in">
+            <!-- Free -->
+            <div class="pricing-card">
+                <h3 data-i18n="pl1_name">Free</h3>
+                <div class="price">$0 <span data-i18n="pl_period">/ forever</span></div>
+                <ul class="pricing-features">
+                    <li data-i18n="pl1_f1">7 emails per day</li>
+                    <li data-i18n="pl1_f2">End-to-end encryption</li>
+                    <li data-i18n="pl1_f3">Wallet authentication</li>
+                </ul>
+                <a href="#" class="btn btn-outline" style="width: 100%;" data-i18n="pl_btn">Get Started</a>
+            </div>
+
+            <!-- Premium -->
+            <div class="pricing-card popular">
+                <div class="popular-badge" data-i18n="pl_pop">Most Popular</div>
+                <h3>Premium</h3>
+                <div class="price">10 <span>TMAIL / mo</span></div>
+                <ul class="pricing-features">
+                    <li data-i18n="pl2_f1">Unlimited emails</li>
+                    <li data-i18n="pl2_f2">Custom wallet aliases</li>
+                    <li data-i18n="pl2_f3">Priority support</li>
+                </ul>
+                <a href="#" class="btn btn-primary" style="width: 100%;" data-i18n="pl_btn">Subscribe</a>
+            </div>
+
+            <!-- Pro -->
+            <div class="pricing-card">
+                <h3>Pro</h3>
+                <div class="price">50 <span>TMAIL / mo</span></div>
+                <ul class="pricing-features">
+                    <li data-i18n="pl3_f1">Everything in Premium</li>
+                    <li data-i18n="pl3_f2">IPFS attachment storage</li>
+                    <li data-i18n="pl3_f3">Early access to Desktop App</li>
+                </ul>
+                <a href="#" class="btn btn-outline" style="width: 100%;" data-i18n="pl_btn">Subscribe</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ROADMAP -->
+    <section id="roadmap" class="section container">
+        <h2 class="section-title fade-in" data-i18n="rm_title">Roadmap</h2>
+        <p class="section-subtitle fade-in" data-i18n="rm_desc">Our journey towards fully decentralized communication.</p>
+
+        <div class="roadmap-list fade-in">
+            <div class="roadmap-item completed">
+                <h3 data-i18n="rm1_t">Phase 1: Web Client</h3>
+                <p data-i18n="rm1_d">Launch of the core web application with wallet login, basic E2EE, and TMAIL integration on Polygon.</p>
+            </div>
+            <div class="roadmap-item">
+                <h3 data-i18n="rm2_t">Phase 2: IPFS Attachments</h3>
+                <p data-i18n="rm2_d">Decentralized file storage integration. Send encrypted files stored on IPFS directly through your emails.</p>
+            </div>
+            <div class="roadmap-item">
+                <h3 data-i18n="rm3_t">Phase 3: Desktop App (Tauri)</h3>
+                <p data-i18n="rm3_d">Native desktop applications for Windows, macOS, and Linux built with Tauri for maximum performance and security.</p>
+            </div>
+            <div class="roadmap-item">
+                <h3 data-i18n="rm4_t">Phase 4: Blockchain Mode</h3>
+                <p data-i18n="rm4_d">Fully on-chain messaging protocol for censorship-resistant communication.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- MOBILE APP SECTION -->
+    <section id="mobile" class="section container" style="text-align: center;">
+        <h2 class="section-title fade-in" data-i18n="mob_title">TMAIL in Your Pocket</h2>
+        <p class="section-subtitle fade-in" data-i18n="mob_desc">Take your encrypted Web3 inbox anywhere. Available as a lightweight PWA or native Android app.</p>
+        
+        <div class="features-grid" style="max-width: 800px; margin: 0 auto;">
+            <!-- PWA Card -->
+            <div class="feature-card fade-in" style="text-align: left;">
+                <div class="feature-icon">📱</div>
+                <h3 data-i18n="mob_pwa_title">Install Web App (PWA)</h3>
+                <p data-i18n="mob_pwa_desc">No app store needed. Open TMAIL in Chrome on Android, tap the menu, and select "Add to Home Screen". Works offline!</p>
+                <button class="btn btn-outline" id="install-pwa-btn" style="margin-top: 20px; display: none;" data-i18n="mob_install_btn">Install App</button>
+            </div>
+            
+            <!-- Native App Card -->
+            <div class="feature-card fade-in" style="text-align: left;">
+                <div class="feature-icon">🤖</div>
+                <h3 data-i18n="mob_native_title">Native Android App</h3>
+                <p data-i18n="mob_native_desc">Built with Tauri for maximum security. Hardware-backed encryption and seamless MetaMask/WalletConnect integration.</p>
+                <a href="/download.html" class="btn btn-primary" style="margin-top: 20px; width: 100%;" data-i18n="mob_apk_btn">Download APK</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-about">
+                    <div class="logo">T<span>MAIL</span></div>
+                    <p data-i18n="foot_about">Secure, private, and decentralized email for the Web3 generation. We do not track, we do not sell, we encrypt.</p>
+                </div>
+                <div class="footer-links">
+                    <h4 data-i18n="foot_product">Product</h4>
+                    <a href="#" data-i18n="nav_launch">Launch Web Client</a>
+                    <a href="#pricing" data-i18n="nav_pricing">Pricing</a>
+                    <a href="#roadmap" data-i18n="nav_roadmap">Roadmap</a>
+                </div>
+                <div class="footer-links">
+                    <h4 data-i18n="foot_legal">Legal & Privacy</h4>
+                    <a href="#" data-i18n="foot_privacy">Privacy Statement</a>
+                    <a href="#" data-i18n="foot_terms">Terms of Service</a>
+                    <a href="mailto:contact@tmail.io" data-i18n="foot_contact">Contact Us</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 TMAIL. <span data-i18n="foot_rights">All rights reserved. Built on Polygon.</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        /**
+         * TRANSLATION DICTIONARY
+         * To add a new language, just add a new object here.
+         */
+        const translations = {
+            en: {
+                nav_features: "Features",
+                nav_how: "How it works",
+                nav_pricing: "Pricing",
+                nav_roadmap: "Roadmap",
+                nav_launch: "Launch App",
+                hero_title: "Private. Encrypted.<br>Web3 Native.",
+                hero_desc: "The email service built for the decentralized era. Wallet login, client-side encryption, zero ads, and absolutely no data selling. Your keys, your emails.",
+                hero_btn_start: "Connect Wallet & Start",
+                hero_btn_learn: "Learn More",
+                feat_title: "Built Different",
+                feat_desc: "We stripped away everything that makes modern email terrible, and added what actually matters.",
+                f1_title: "End-to-End Encryption",
+                f1_desc: "Client-side cryptography ensures that only you and your recipient can read your messages. Not even we can see them.",
+                f2_title: "Wallet Login",
+                f2_desc: "No passwords to forget. Authenticate seamlessly using MetaMask, WalletConnect, or any Web3 wallet.",
+                f3_title: "Zero Ads & Tracking",
+                f3_desc: "We don't sell your data. We don't show you ads. Ever. Our business model is based on utility, not surveillance.",
+                f4_title: "Generous Free Plan",
+                f4_desc: "Send up to 7 encrypted emails per day completely free. Upgrade only when you need more power.",
+                how_title: "How It Works",
+                how_desc: "Three simple steps to secure communication.",
+                s1_title: "Register",
+                s1_desc: "Connect your Web3 wallet. Your address becomes your identity. No personal info required.",
+                s2_title: "Encrypt",
+                s2_desc: "Compose your message. Client-side crypto locks it down before it ever leaves your browser.",
+                s3_title: "Send",
+                s3_desc: "Transmit securely over our decentralized infrastructure. Only the holder of the destination key can decrypt.",
+                tok_badge: "Polygon Network",
+                tok_title: "Powered by $TMAIL",
+                tok_p1: "TMAIL is the native utility token of our ecosystem. Premium subscriptions are paid exclusively in TMAIL, creating a closed-loop, community-owned economy.",
+                tok_p2: "<strong>Anti-Whale Protection:</strong> Smart contracts enforce holding limits and transaction caps to prevent market manipulation and ensure fair distribution.",
+                pr_title: "Simple Pricing",
+                pr_desc: "Start for free. Scale with crypto.",
+                pl1_name: "Free",
+                pl_period: "/ forever",
+                pl1_f1: "7 emails per day",
+                pl1_f2: "End-to-end encryption",
+                pl1_f3: "Wallet authentication",
+                pl2_f1: "Unlimited emails",
+                pl2_f2: "Custom wallet aliases",
+                pl2_f3: "Priority support",
+                pl3_f1: "Everything in Premium",
+                pl3_f2: "IPFS attachment storage",
+                pl3_f3: "Early access to Desktop App",
+                pl_pop: "Most Popular",
+                pl_btn: "Get Started",
+                rm_title: "Roadmap",
+                rm_desc: "Our journey towards fully decentralized communication.",
+                rm1_t: "Phase 1: Web Client",
+                rm1_d: "Launch of the core web application with wallet login, basic E2EE, and TMAIL integration on Polygon.",
+                rm2_t: "Phase 2: IPFS Attachments",
+                rm2_d: "Decentralized file storage integration. Send encrypted files stored on IPFS directly through your emails.",
+                rm3_t: "Phase 3: Desktop App (Tauri)",
+                rm3_d: "Native desktop applications for Windows, macOS, and Linux built with Tauri for maximum performance and security.",
+                rm4_t: "Phase 4: Blockchain Mode",
+                rm4_d: "Fully on-chain messaging protocol for censorship-resistant communication.",
+                mob_title: "TMAIL in Your Pocket",
+                mob_desc: "Take your encrypted Web3 inbox anywhere. Available as a lightweight PWA or native Android app.",
+                mob_pwa_title: "Install Web App (PWA)",
+                mob_pwa_desc: "No app store needed. Open TMAIL in Chrome on Android, tap the menu, and select 'Add to Home Screen'. Works offline!",
+                mob_install_btn: "Install App",
+                mob_native_title: "Native Android App",
+                mob_native_desc: "Built with Tauri for maximum security. Hardware-backed encryption and seamless wallet integration.",
+                mob_apk_btn: "Download APK",
+                foot_about: "Secure, private, and decentralized email for the Web3 generation. We do not track, we do not sell, we encrypt.",
+                foot_product: "Product",
+                foot_legal: "Legal & Privacy",
+                foot_privacy: "Privacy Statement",
+                foot_terms: "Terms of Service",
+                foot_contact: "Contact Us",
+                foot_rights: "All rights reserved. Built on Polygon."
+            },
+            ru: {
+                nav_features: "Возможности",
+                nav_how: "Как это работает",
+                nav_pricing: "Тарифы",
+                nav_roadmap: "Дорожная карта",
+                nav_launch: "Запустить",
+                hero_title: "Приватно. Зашифровано.<br>Нативно для Web3.",
+                hero_desc: "Почтовый сервис эпохи децентрализации. Вход через кошелек, шифрование на стороне клиента, ноль рекламы и никакой продажи данных. Ваши ключи — ваша почта.",
+                hero_btn_start: "Подключить кошелек",
+                hero_btn_learn: "Узнать больше",
+                feat_title: "Создано иначе",
+                feat_desc: "Мы убрали всё, что делает современную почту ужасной, и оставили только то, что действительно важно.",
+                f1_title: "Сквозное шифрование",
+                f1_desc: "Криптография на стороне клиента гарантирует, что сообщения можете прочитать только вы и получатель. Даже мы не имеем к ним доступа.",
+                f2_title: "Вход через кошелек",
+                f2_desc: "Никаких паролей. Мгновенная аутентификация через MetaMask, WalletConnect или любой Web3-кошелек.",
+                f3_title: "Без рекламы и трекинга",
+                f3_desc: "Мы не продаем ваши данные. Мы не показываем рекламу. Никогда. Наша модель строится на пользе, а не на слежке.",
+                f4_title: "Щедрый бесплатный план",
+                f4_desc: "До 7 зашифрованных писем в день абсолютно бесплатно. Переходите на платный тариф только когда нужно больше.",
+                how_title: "Как это работает",
+                how_desc: "Три простых шага к безопасному общению.",
+                s1_title: "Регистрация",
+                s1_desc: "Подключите Web3-кошелек. Ваш адрес становится вашим идентификатором. Никаких личных данных.",
+                s2_title: "Шифрование",
+                s2_desc: "Напишите сообщение. Клиентская криптография блокирует его до того, как оно покинет ваш браузер.",
+                s3_title: "Отправка",
+                s3_desc: "Безопасная передача по децентрализованной инфраструктуре. Расшифровать сможет только владелец ключа.",
+                tok_badge: "Сеть Polygon",
+                tok_title: "Работает на $TMAIL",
+                tok_p1: "TMAIL — нативный утилитарный токен экосистемы. Премиум-подписки оплачиваются исключительно в TMAIL, создавая замкнутую экономику сообщества.",
+                tok_p2: "<strong>Защита от китов:</strong> Смарт-контракты устанавливают лимиты на хранение и транзакции, предотвращая манипуляции рынком.",
+                pr_title: "Простые тарифы",
+                pr_desc: "Начните бесплатно. Масштабируйтесь с криптой.",
+                pl1_name: "Бесплатно",
+                pl_period: "/ навсегда",
+                pl1_f1: "7 писем в день",
+                pl1_f2: "Сквозное шифрование",
+                pl1_f3: "Аутентификация кошельком",
+                pl2_f1: "Безлимитные письма",
+                pl2_f2: "Кастомные алиасы",
+                pl2_f3: "Приоритетная поддержка",
+                pl3_f1: "Всё из Premium",
+                pl3_f2: "Хранение вложений в IPFS",
+                pl3_f3: "Ранний доступ к десктопу",
+                pl_pop: "Популярный",
+                pl_btn: "Начать",
+                rm_title: "Дорожная карта",
+                rm_desc: "Наш путь к полностью децентрализованным коммуникациям.",
+                rm1_t: "Фаза 1: Веб-клиент",
+                rm1_d: "Запуск веб-приложения с входом через кошелек, базовым E2EE и интеграцией TMAIL на Polygon.",
+                rm2_t: "Фаза 2: Вложения через IPFS",
+                rm2_d: "Интеграция децентрализованного хранилища. Отправка зашифрованных файлов через IPFS.",
+                rm3_t: "Фаза 3: Десктоп (Tauri)",
+                rm3_d: "Нативные приложения для Windows, macOS и Linux на базе Tauri для максимальной безопасности.",
+                rm4_t: "Фаза 4: Блокчейн-режим",
+                rm4_d: "Полностью ончейн-протокол сообщений для устойчивой к цензуре связи.",
+                mob_title: "TMAIL в вашем кармане",
+                mob_desc: "Берите зашифрованную почту везде. Доступно как PWA или нативное приложение.",
+                mob_pwa_title: "Установить веб-приложение (PWA)",
+                mob_pwa_desc: "Не нужен магазин приложений. Откройте в Chrome на Android и нажмите 'На главный экран'.",
+                mob_install_btn: "Установить",
+                mob_native_title: "Нативное Android-приложение",
+                mob_native_desc: "Создано на Tauri для максимальной безопасности. Аппаратное шифрование и интеграция с кошельками.",
+                mob_apk_btn: "Скачать APK",
+                foot_about: "Безопасная, приватная и децентрализованная почта для поколения Web3. Мы не следим, не продаем — мы шифруем.",
+                foot_product: "Продукт",
+                foot_legal: "Правовая информация",
+                foot_privacy: "Политика конфиденциальности",
+                foot_terms: "Условия использования",
+                foot_contact: "Связаться с нами",
+                foot_rights: "Все права защищены. Построено на Polygon."
+            },
+            de: {
+                nav_features: "Funktionen",
+                nav_how: "So funktioniert's",
+                nav_pricing: "Preise",
+                nav_roadmap: "Roadmap",
+                nav_launch: "App starten",
+                hero_title: "Privat. Verschlüsselt.<br>Web3 Nativ.",
+                hero_desc: "Der E-Mail-Dienst für das dezentrale Zeitalter. Wallet-Login, clientseitige Verschlüsselung, keine Werbung und absolut kein Datenverkauf.",
+                hero_btn_start: "Wallet verbinden",
+                hero_btn_learn: "Mehr erfahren",
+                feat_title: "Anders gebaut",
+                feat_desc: "Wir haben alles entfernt, was moderne E-Mails schrecklich macht, und hinzugefügt, was wirklich zählt.",
+                f1_title: "Ende-zu-Ende-Verschlüsselung",
+                f1_desc: "Clientseitige Kryptografie stellt sicher, dass nur Sie und Ihr Empfänger Ihre Nachrichten lesen können.",
+                f2_title: "Wallet-Login",
+                f2_desc: "Keine Passwörter. Authentifizieren Sie sich nahtlos mit MetaMask oder einem anderen Web3-Wallet.",
+                f3_title: "Keine Werbung & Tracking",
+                f3_desc: "Wir verkaufen Ihre Daten nicht. Wir zeigen keine Werbung. Unser Modell basiert auf Nutzen, nicht auf Überwachung.",
+                f4_title: "Großzügiger Gratis-Tarif",
+                f4_desc: "Senden Sie bis zu 7 verschlüsselte E-Mails pro Tag völlig kostenlos.",
+                how_title: "So funktioniert es",
+                how_desc: "Drei einfache Schritte zur sicheren Kommunikation.",
+                s1_title: "Registrieren",
+                s1_desc: "Verbinden Sie Ihr Web3-Wallet. Ihre Adresse wird zu Ihrer Identität.",
+                s2_title: "Verschlüsseln",
+                s2_desc: "Verfassen Sie Ihre Nachricht. Die clientseitige Krypto sperrt sie ab, bevor sie den Browser verlässt.",
+                s3_title: "Senden",
+                s3_desc: "Sichere Übertragung über unsere dezentrale Infrastruktur.",
+                tok_badge: "Polygon Netzwerk",
+                tok_title: "Angetrieben von $TMAIL",
+                tok_p1: "TMAIL ist der native Utility-Token unseres Ökosystems. Premium-Abonnements werden ausschließlich in TMAIL bezahlt.",
+                tok_p2: "<strong>Anti-Whale-Schutz:</strong> Smart Contracts erzwingen Haltegrenzen, um Marktmanipulationen zu verhindern.",
+                pr_title: "Einfache Preise",
+                pr_desc: "Kostenlos starten. Mit Krypto skalieren.",
+                pl1_name: "Gratis",
+                pl_period: "/ für immer",
+                pl1_f1: "7 E-Mails pro Tag",
+                pl1_f2: "Ende-zu-Ende-Verschlüsselung",
+                pl1_f3: "Wallet-Authentifizierung",
+                pl2_f1: "Unbegrenzte E-Mails",
+                pl2_f2: "Benutzerdefinierte Aliase",
+                pl2_f3: "Prioritäts-Support",
+                pl3_f1: "Alles in Premium",
+                pl3_f2: "IPFS-Anhangspeicher",
+                pl3_f3: "Früher Zugang zur Desktop-App",
+                pl_pop: "Am beliebtesten",
+                pl_btn: "Loslegen",
+                rm_title: "Roadmap",
+                rm_desc: "Unsere Reise zur vollständig dezentralen Kommunikation.",
+                rm1_t: "Phase 1: Web-Client",
+                rm1_d: "Start der Web-App mit Wallet-Login und TMAIL-Integration auf Polygon.",
+                rm2_t: "Phase 2: IPFS-Anhänge",
+                rm2_d: "Dezentrale Dateispeicher-Integration.",
+                rm3_t: "Phase 3: Desktop-App (Tauri)",
+                rm3_d: "Native Apps für Windows, macOS und Linux, erstellt mit Tauri.",
+                rm4_t: "Phase 4: Blockchain-Modus",
+                rm4_d: "Vollständig On-Chain Messaging-Protokoll.",
+                mob_title: "TMAIL in Ihrer Tasche",
+                mob_desc: "Nehmen Sie Ihr verschlüsseltes Web3-Postfach überall hin mit. Verfügbar als PWA oder native Android-App.",
+                mob_pwa_title: "Web-App installieren (PWA)",
+                mob_pwa_desc: "Kein App-Store nötig. Öffnen Sie TMAIL in Chrome auf Android und tippen Sie auf 'Zum Startbildschirm hinzufügen'.",
+                mob_install_btn: "Installieren",
+                mob_native_title: "Native Android-App",
+                mob_native_desc: "Entwickelt mit Tauri für maximale Sicherheit. Hardwaregestützte Verschlüsselung und Wallet-Integration.",
+                mob_apk_btn: "APK herunterladen",
+                foot_about: "Sichere, private und dezentrale E-Mails für die Web3-Generation.",
+                foot_product: "Produkt",
+                foot_legal: "Rechtliches & Datenschutz",
+                foot_privacy: "Datenschutzerklärung",
+                foot_terms: "Nutzungsbedingungen",
+                foot_contact: "Kontakt",
+                foot_rights: "Alle Rechte vorbehalten. Gebaut auf Polygon."
+            },
+            fr: {
+                nav_features: "Fonctionnalités",
+                nav_how: "Comment ça marche",
+                nav_pricing: "Tarifs",
+                nav_roadmap: "Feuille de route",
+                nav_launch: "Lancer l'App",
+                hero_title: "Privé. Chiffré.<br>Natif Web3.",
+                hero_desc: "Le service de messagerie conçu pour l'ère décentralisée. Connexion par portefeuille, chiffrement côté client, zéro pub et aucune vente de données.",
+                hero_btn_start: "Connecter le Portefeuille",
+                hero_btn_learn: "En savoir plus",
+                feat_title: "Conçu Autrement",
+                feat_desc: "Nous avons supprimé tout ce qui rend les e-mails modernes terribles pour ne garder que l'essentiel.",
+                f1_title: "Chiffrement de bout en bout",
+                f1_desc: "La cryptographie côté client garantit que seuls vous et votre destinataire pouvez lire vos messages.",
+                f2_title: "Connexion Wallet",
+                f2_desc: "Pas de mots de passe. Authentifiez-vous via MetaMask ou tout autre portefeuille Web3.",
+                f3_title: "Zéro Pub & Tracking",
+                f3_desc: "Nous ne vendons pas vos données. Nous n'affichons pas de publicités. Notre modèle repose sur l'utilité.",
+                f4_title: "Plan Gratuit Généreux",
+                f4_desc: "Envoyez jusqu'à 7 e-mails chiffrés par jour gratuitement.",
+                how_title: "Comment ça marche",
+                how_desc: "Trois étapes simples pour une communication sécurisée.",
+                s1_title: "Inscription",
+                s1_desc: "Connectez votre portefeuille Web3. Votre adresse devient votre identité.",
+                s2_title: "Chiffrer",
+                s2_desc: "Rédigez votre message. Le chiffrement côté client le verrouille avant qu'il ne quitte votre navigateur.",
+                s3_title: "Envoyer",
+                s3_desc: "Transmission sécurisée via notre infrastructure décentralisée.",
+                tok_badge: "Réseau Polygon",
+                tok_title: "Propulsé par $TMAIL",
+                tok_p1: "TMAIL est le jeton utilitaire natif de notre écosystème. Les abonnements sont payés exclusivement en TMAIL.",
+                tok_p2: "<strong>Protection Anti-Baleine :</strong> Les smart contracts imposent des limites pour éviter la manipulation du marché.",
+                pr_title: "Tarification Simple",
+                pr_desc: "Commencez gratuitement. Évoluez avec la crypto.",
+                pl1_name: "Gratuit",
+                pl_period: "/ pour toujours",
+                pl1_f1: "7 e-mails par jour",
+                pl1_f2: "Chiffrement de bout en bout",
+                pl1_f3: "Authentification par wallet",
+                pl2_f1: "E-mails illimités",
+                pl2_f2: "Alias personnalisés",
+                pl2_f3: "Support prioritaire",
+                pl3_f1: "Tout dans Premium",
+                pl3_f2: "Stockage pièces jointes IPFS",
+                pl3_f3: "Accès anticipé à l'app bureau",
+                pl_pop: "Le plus populaire",
+                pl_btn: "Commencer",
+                rm_title: "Feuille de route",
+                rm_desc: "Notre parcours vers une communication entièrement décentralisée.",
+                rm1_t: "Phase 1 : Client Web",
+                rm1_d: "Lancement de l'application web avec connexion wallet et intégration TMAIL sur Polygon.",
+                rm2_t: "Phase 2 : Pièces jointes IPFS",
+                rm2_d: "Intégration du stockage de fichiers décentralisé.",
+                rm3_t: "Phase 3 : Application Bureau (Tauri)",
+                rm3_d: "Applications natives pour Windows, macOS et Linux construites avec Tauri.",
+                rm4_t: "Phase 4 : Mode Blockchain",
+                rm4_d: "Protocole de messagerie entièrement on-chain résistant à la censure.",
+                mob_title: "TMAIL dans votre poche",
+                mob_desc: "Emportez votre boîte mail chiffrée partout. Disponible en PWA légère ou application Android native.",
+                mob_pwa_title: "Installer l'appli Web (PWA)",
+                mob_pwa_desc: "Pas besoin de magasin d'applications. Ouvrez TMAIL dans Chrome sur Android et touchez 'Ajouter à l'écran d'accueil'.",
+                mob_install_btn: "Installer",
+                mob_native_title: "Application Android native",
+                mob_native_desc: "Conçu avec Tauri pour une sécurité maximale. Chiffrement matériel et intégration de portefeuille.",
+                mob_apk_btn: "Télécharger APK",
+                foot_about: "Messagerie sécurisée, privée et décentralisée pour la génération Web3.",
+                foot_product: "Produit",
+                foot_legal: "Légal & Confidentialité",
+                foot_privacy: "Politique de confidentialité",
+                foot_terms: "Conditions d'utilisation",
+                foot_contact: "Nous contacter",
+                foot_rights: "Tous droits réservés. Construit sur Polygon."
+            }
+        };
+
+        /**
+         * LANGUAGE SWITCHER LOGIC
+         */
+        function changeLanguage(lang) {
+            // Update HTML lang attribute
+            document.documentElement.lang = lang;
+
+            // Update UI buttons
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.innerText === lang.toUpperCase()) btn.classList.add('active');
+            });
+
+            // Translate elements
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    // Use innerHTML to support tags like <br> and <strong>
+                    el.innerHTML = translations[lang][key];
+                }
+            });
+
+            // Save preference
+            localStorage.setItem('tmail_lang', lang);
+        }
+
+        /**
+         * SCROLL ANIMATIONS (Intersection Observer)
+         */
+        document.addEventListener("DOMContentLoaded", () => {
+            // Load saved language
+            const savedLang = localStorage.getItem('tmail_lang') || 'en';
+            changeLanguage(savedLang);
+
+            // Fade-in animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: "0px 0px -50px 0px"
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+        });
+
+        /**
+         * SMOOTH SCROLL FOR ANCHOR LINKS
+         */
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        /**
+         * PWA INSTALL LOGIC
+         */
+        let deferredPrompt;
+        const installBtn = document.getElementById('install-pwa-btn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (installBtn) {
+                installBtn.style.display = 'inline-flex';
+            }
+        });
+
+        if (installBtn) {
+            installBtn.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log(`User response to the install prompt: ${outcome}`);
+                    deferredPrompt = null;
+                    installBtn.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

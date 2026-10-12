@@ -1,0 +1,20 @@
+{
+  "name": "tokemail-server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TokenMail mail server - blind courier of encrypted packets",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.3.0",
+    "@fastify/multipart": "^10.1.1",
+    "@fastify/rate-limit": "^11.2.0",
+    "better-sqlite3": "^13.0.3",
+    "ethers": "^6.17.0",
+    "fastify": "^5.12.4",
+    "pino-pretty": "^13.1.3"
+  }
+}

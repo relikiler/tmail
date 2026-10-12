@@ -1,0 +1,19 @@
+# deps
+node_modules/
+dist/
+build/
+
+# secrets — никогда не коммитить
+.env
+*.env
+*.pem
+*_key
+.backup_key
+*.sql.enc
+
+# OS
+.DS_Store
+Thumbs.db
+
+# logs
+*.log
