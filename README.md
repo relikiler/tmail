@@ -29,12 +29,12 @@ end-to-end. Сервер — *«слепой курьер»*: он видит т
 
 ## Контракты (Polygon mainnet)
 
-| Контракт | Адрес | Статус |
-|---|---|---|
-| TokenMail (TMAIL) | `0xE683F5Cb2dFB9abb6D0d460B3E49AE760903e4fA` | deployed |
-| Mailbox | `0xe8a2827db1fe0667aaa659a148645a409217f3d6` | deployed |
-| MailLog | `0x6ae7773F5B9DDB4DF32DA753f820F3D7F08d0691` | verified |
-| LifetimePass | `0x2313D8c92D99240E34138419bC03b01769863039` | verified |
+| Контракт | Адрес | Статус | Polygonscan |
+|---|---|---|---|
+| TokenMail (TMAIL) | `0xE683F5Cb2dFB9abb6D0d460B3E49AE760903e4fA` | deployed | [view](https://polygonscan.com/token/0xE683F5Cb2dFB9abb6D0d460B3E49AE760903e4fA) |
+| Mailbox | `0xe8a2827db1fe0667aaa659a148645a409217f3d6` | deployed | [view](https://polygonscan.com/address/0xe8a2827db1fe0667aaa659a148645a409217f3d6) |
+| MailLog | `0x6ae7773F5B9DDB4DF32DA753f820F3D7F08d0691` | verified | [view](https://polygonscan.com/address/0x6ae7773F5B9DDB4DF32DA753f820F3D7F08d0691) |
+| LifetimePass | `0x2313D8c92D99240E34138419bC03b01769863039` | verified | [view](https://polygonscan.com/address/0x2313D8c92D99240E34138419bC03b01769863039) |
 
 ## Структура репозитория
 
