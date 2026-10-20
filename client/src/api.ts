@@ -1,5 +1,5 @@
 const isTauri = typeof window !== 'undefined' && !!(window as any).__TAURI__
-const API_BASE = import.meta.env.VITE_API_BASE || (isTauri ? 'https://195.209.212.237.nip.io/api' : '/api')
+const API_BASE = import.meta.env.VITE_API_BASE || (isTauri ? 'https://api.tmail.io/api' : '/api')
 
 export interface User {
   address: string

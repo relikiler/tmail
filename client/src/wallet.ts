@@ -35,8 +35,8 @@ async function getProvider(): Promise<any> {
     metadata: {
       name: 'TMAIL',
       description: 'Encrypted Web3 Email on Polygon',
-      url: 'https://195.209.212.237.nip.io',
-      icons: ['https://195.209.212.237.nip.io/app/favicon.svg'],
+      url: 'https://api.tmail.io',
+      icons: ['https://api.tmail.io/app/favicon.svg'],
     },
   })
 

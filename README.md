@@ -67,6 +67,36 @@ Polygon и Filecoin/IPFS. Пожертвования и грантовая по�
 
 ENS: `senbazuru.uni.eth`
 
+## Android — сборка APK (Tauri)
+
+Требования: Rust, Android SDK (compileSdk 36), JDK 21, cargo-tauri.
+
+```bash
+cd client
+npm install
+# собрать фронтенд под Tauri
+npx vite build --config vite.tauri.config.ts
+# собрать APK (arm64)
+export ANDROID_HOME=/path/to/android-sdk
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+cargo tauri android build --apk --target aarch64
+```
+
+Результат: `client/src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-arm64-v8a-release.apk`.
+
+**Подпись:** release-подпись через `tmail-release.keystore` (alias `tmail`).
+**Версия (min):** Android 7.0 (minSdk 24), 64-bit arm64.
+
+Готовый APK публикуется в GitHub Releases: `https://github.com/relikiler/tmail/releases`.
+
+## Публикация
+
+- **GitHub Releases:** подписанный APK + SHA-256 (см. тег `v0.1.0`).
+- **Прямые ссылки:** лендинг `/downloads/`.
+- Текущий процесс нацелен на прозрачную автономную дистрибуцию
+  (из-за Rust/Tauri-сборки юзеры чаще ставят APK из релизов, чем через
+  F-Droid-билд-серверы, не собирающие Rust).
+
 ## Лицензия
 
 MIT
