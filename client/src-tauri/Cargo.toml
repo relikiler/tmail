@@ -1,0 +1,35 @@
+[package]
+name = "tmail-app"
+version = "0.1.0"
+description = "TMAIL — Encrypted Web3 Email"
+authors = ["TMAIL"]
+edition = "2021"
+rust-version = "1.77.2"
+
+[lib]
+name = "tmail_app_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.6.3", features = [] }
+
+[dependencies]
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+log = "0.4"
+tauri = { version = "2.11.3", features = [] }
+tauri-plugin-log = "2"
+# Crypto
+aes-gcm = "0.10"
+x25519-dalek = { version = "2", features = ["static_secrets"] }
+rand = "0.8"
+hex = "0.4"
+# RPC (for token balance) — rustls only, no OpenSSL (needed for Android build)
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+sha3 = "0.10"
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+strip = true

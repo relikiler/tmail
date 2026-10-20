@@ -16,4 +16,15 @@ build/
 Thumbs.db
 
 # logs
-*.log
+*.logapp/keystore/ || keystore/
+
+# Client (Tauri/Android)
+client/node_modules/
+client/dist/
+client/dist-tauri/
+client/src-tauri/target/
+client/src-tauri/gen/android/app/build/
+client/src-tauri/gen/android/.gradle/
+client/src-tauri/gen/android/*/build/
+client/src-tauri/gen/android/local.properties
+client/src-tauri/gen/android/app/keystore/
