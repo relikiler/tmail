@@ -169,3 +169,39 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+/* === TMAIL buttons — rounded (pill-like, messenger style) === */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border: 1px solid transparent;
+  border-radius: 999px; /* fully rounded / pill */
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s, transform 0.08s;
+  color: #fafafa;
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+}
+.btn:hover {
+  filter: brightness(1.08);
+}
+.btn:active {
+  transform: scale(0.97);
+}
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.btn-outline {
+  background: transparent;
+  border-color: #3f3f46;
+  color: #e4e4e7;
+}
+.btn-outline:hover {
+  background: rgba(255, 255, 255, 0.06);
+  filter: none;
+}
