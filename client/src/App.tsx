@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { api } from './api'
 import type { User, MailMeta } from './api'
-import { generateX25519, generateEd25519, generateEphemeralX25519, pubKeyHex, hex, fromHex, deriveSharedSecret, encryptAesGcm, decryptAesGcm, ed25519Sign, prepareSignatureData } from './crypto'
+import { generateX25519, generateEd25519, generateEphemeralX25519, pubKeyHex, hex, fromHex, deriveSharedSecret, encryptAesGcm, decryptAesGcm, ed25519Sign, prepareSignatureData, verifyMailSignature } from './crypto'
 import { connectMetaMask, initWalletConnect, finishWalletConnect, hasMetaMask, signMessage, shortenAddress } from './wallet'
 import type { WcPending } from './wallet'
 import QRCode from 'qrcode'
@@ -347,6 +347,7 @@ function InboxPage({ mails, user, x25519, toastError, onAddContact, t }: { mails
   const [body, setBody] = useState('')
   const [attachments, setAttachments] = useState<{ cid: string; name: string; size: number; key: string }[]>([])
   const [immutable, setImmutable] = useState(false)
+  const [sigValid, setSigValid] = useState<boolean | null>(null)
 
   const openMail = async (id: string) => {
     setSelected(id)
@@ -360,12 +361,28 @@ function InboxPage({ mails, user, x25519, toastError, onAddContact, t }: { mails
         setBody('(cannot decrypt — no key for this device)')
         return
       }
+      // Verify ed25519 signature over the ciphertext before decrypting (E2E integrity).
+      // Sender's ed25519 public key is fetched from their registered devices.
+      let sigValid = false
+      try {
+        const fullCipher = mail.ciphertext!
+        const dot = fullCipher.lastIndexOf('.')
+        const ctPart = fullCipher.slice(0, dot)
+        const devs = await api.getDevices(mail.from_addr)
+        const senderEd = devs.devices?.[0]?.pub_ed25519
+        const mailSig = mail.sig ? fromHex(mail.sig) : null
+        if (senderEd && mailSig && mail.ts) {
+          sigValid = verifyMailSignature(mail.from_addr, [user], ctPart, mail.ts, mail.sig!, senderEd)
+        }
+      } catch { /* sig check non-fatal: still try to decrypt */ }
+
       const ephPub = fromHex(mail.perRecipient[user])
       const shared = deriveSharedSecret(fromHex(x25519.sk), ephPub)
       const dot = mail.ciphertext!.lastIndexOf('.')
       const ct = mail.ciphertext!.slice(0, dot)
       const nonce = mail.ciphertext!.slice(dot + 1)
       const dec = await decryptAesGcm(shared, { ephemeralPubkey: '', nonce, ciphertext: ct })
+      setSigValid(sigValid)
       try {
         const parsed = JSON.parse(dec)
         setBody(parsed.body || dec)
@@ -404,6 +421,11 @@ function InboxPage({ mails, user, x25519, toastError, onAddContact, t }: { mails
           </div>
           {selected === m.id && (
             <div style={{ marginTop: 12, padding: 16, background: '#18181b', borderRadius: 8 }}>
+              {sigValid !== null && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10, padding: '6px 10px', background: sigValid ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)', border: `1px solid ${sigValid ? 'rgba(16,185,129,0.4)' : 'rgba(239,68,68,0.4)'}`, borderRadius: 8, fontSize: '0.8rem', color: sigValid ? '#34d399' : '#f87171' }}>
+                  {sigValid ? '✓ Signature verified (E2E)' : '✗ Signature invalid'}
+                </div>
+              )}
               {immutable && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10, padding: '6px 10px', background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.4)', borderRadius: 8, fontSize: '0.8rem', color: '#c4b5fd' }}>
                   ⛓️ Immutable — record on Polygon (hash + CID)
@@ -514,7 +536,7 @@ function ComposePage({ user, x25519, ed25519, toastError, toastSuccess, t }: { u
       const fileAttachments: { cid: string; name: string; size: number; key: string }[] = []
       for (const a of attachments) {
         const { encrypted, key } = await encryptFile(a.file)
-        const cid = await uploadToIPFS(encrypted)
+        const cid = await uploadToIPFS(encrypted, user)
         fileAttachments.push({ cid, name: a.file.name, size: a.file.size, key })
       }
 
@@ -560,7 +582,7 @@ function ComposePage({ user, x25519, ed25519, toastError, toastSuccess, t }: { u
               const blob = new Blob([encrypted.ciphertext], { type: 'application/octet-stream' })
               const file = new File([blob], 'mail.enc')
               const { encrypted: encBlob } = await encryptFile(file)
-              return uploadToIPFS(encBlob)
+              return uploadToIPFS(encBlob, user)
             })()
             const { txHash } = await logImmutableMail(wallet.signer, user, to, payloadHash, cid)
             toastSuccess(`Immutable: recorded on-chain (${txHash.slice(0, 10)}...)`)

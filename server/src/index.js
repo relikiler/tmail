@@ -105,7 +105,18 @@ const app = Fastify({
   bodyLimit: 128 * 1024 * 1024
 })
 
-await app.register(cors, { origin: true })
+const ALLOWED_ORIGINS = [
+  'https://195.209.212.237.nip.io',
+  'https://app.tmail.io',
+  'tauri://localhost',
+  'http://tauri.localhost',
+]
+await app.register(cors, {
+  origin: (origin, cb) => {
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) return cb(null, true)
+    return cb(new Error('Not allowed by CORS'), false)
+  },
+})
 
 await app.register(rateLimit, {
   global: false,
@@ -325,6 +336,13 @@ app.post('/api/subscribe/lifetime', async (req, reply) => {
 app.post('/api/upload', {
   config: { rateLimit: { max: 100, timeWindow: '1 minute' } }
 }, async (req, reply) => {
+  // Auth: uploader must be a registered user (address in users table).
+  const addr = req.headers['x-tmail-address']
+  if (!isAddr(addr)) return reply.code(401).send({ error: 'upload requires registered address' })
+  if (!db.prepare(`SELECT 1 FROM users WHERE address = ?`).get(addr)) {
+    return reply.code(401).send({ error: 'upload requires registered address' })
+  }
+  const jwt = process.env.PINATA_JWT
   if (!jwt) return reply.code(500).send({ error: 'upload not configured on server' })
   const part = await req.file?.()
   if (!part) return reply.code(400).send({ error: 'file required' })

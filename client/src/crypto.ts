@@ -1,4 +1,5 @@
 import { x25519, ed25519 } from '@noble/curves/ed25519.js'
+import { sha256 } from '@noble/hashes/sha2.js'
 import { randomBytes } from '@noble/hashes/utils.js'
 
 export interface KeypairX25519 {
@@ -103,4 +104,22 @@ export async function decryptAesGcm(shared: Uint8Array, payload: EncryptedPayloa
 export function prepareSignatureData(from: string, to: string[], bodyHash: string, ts: number): Uint8Array {
   const data = `TMAIL:${from}:${to.join(',')}:${bodyHash}:${ts}`
   return encoder.encode(data)
+}
+
+export function verifyMailSignature(
+  fromPkt: string,
+  to: string[],
+  ciphertext: string,
+  ts: number,
+  signatureHex: string,
+  senderEdPubHex: string,
+): boolean {
+  try {
+    const pub = fromHex(senderEdPubHex.trim().replace(/^0x/, ''))
+    const cipherHash = hex(sha256(encoder.encode(ciphertext)))
+    const sigData = prepareSignatureData(fromPkt, to, cipherHash, ts)
+    return ed25519.verify(fromHex(signatureHex), sigData, pub)
+  } catch {
+    return false
+  }
 }
