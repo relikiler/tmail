@@ -1,5 +1,4 @@
 import { x25519, ed25519 } from '@noble/curves/ed25519.js'
-import { sha256 } from '@noble/hashes/sha2.js'
 import { randomBytes } from '@noble/hashes/utils.js'
 
 export interface KeypairX25519 {
@@ -64,8 +63,17 @@ export function ed25519Verify(publicKey: Uint8Array, signature: Uint8Array, mess
 }
 
 async function aesKeyFromShared(shared: Uint8Array): Promise<CryptoKey> {
-  const hash = sha256(shared)
-  return crypto.subtle.importKey('raw', toArrayBuffer(hash), 'AES-GCM', false, ['encrypt', 'decrypt'])
+  // Единый протокол обмена ключами: HKDF-SHA256 из shared secret X25519.
+  // Должен совпадать с Rust-клиентом (src-tauri/src/crypto.rs).
+  const info = new TextEncoder().encode('TMAIL/aes-gcm/v1')
+  const base = await crypto.subtle.importKey('raw', toArrayBuffer(shared), 'HKDF', false, ['deriveKey'])
+  return crypto.subtle.deriveKey(
+    { name: 'HKDF', hash: 'SHA-256', salt: new Uint8Array(0), info: toArrayBuffer(info) },
+    base,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt', 'decrypt'],
+  )
 }
 
 function toArrayBuffer(u8: Uint8Array): ArrayBuffer {

@@ -526,16 +526,17 @@ function ComposePage({ user, x25519, ed25519, toastError, toastSuccess, t }: { u
       const perRecipient: Record<string, string> = {}
       perRecipient[to] = pubKeyHex(eph.publicKey)
 
-      const bodyHash = hex(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(bodyText))))
+      const fullCipher = encrypted.ciphertext + '.' + encrypted.nonce
+      const cipherHash = hex(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(fullCipher))))
       const ts = Date.now()
-      const sigData = prepareSignatureData(user, [to], bodyHash, ts)
+      const sigData = prepareSignatureData(user, [to], cipherHash, ts)
       const sig = ed25519Sign(fromHex(ed25519.sk), sigData)
 
       await api.sendMail({
         id: crypto.randomUUID(),
         from: user,
         to: [to],
-        ciphertext: encrypted.ciphertext + '.' + encrypted.nonce,
+        ciphertext: fullCipher,
         perRecipient,
         sig: hex(sig),
         ts,

@@ -2,6 +2,8 @@ use aes_gcm::{
     aead::{Aead, KeyInit, OsRng},
     Aes256Gcm, Nonce,
 };
+use hkdf::Hkdf;
+use sha2::Sha256;
 use rand::RngCore;
 use serde::{Deserialize, Serialize};
 use x25519_dalek::{EphemeralSecret, PublicKey, StaticSecret};
@@ -17,6 +19,18 @@ pub struct EncryptedPayload {
     pub ephemeral_pubkey: String,
     pub nonce: String,
     pub ciphertext: String,
+}
+
+
+/// Единый протокол обмена ключами: HKDF-SHA256 из shared secret X25519.
+/// Должен совпадать с веб-клиентом (client/src/crypto.ts).
+const KEY_LABEL: &[u8] = b"TMAIL/aes-gcm/v1";
+
+fn aes_key_from_shared(shared: &x25519_dalek::SharedSecret) -> [u8; 32] {
+    let hk = Hkdf::<Sha256>::new(None, shared.as_bytes());
+    let mut key = [0u8; 32];
+    hk.expand(KEY_LABEL, &mut key).expect("hkdf expand");
+    key
 }
 
 fn pubkey_from_hex(h: &str) -> Result<PublicKey, String> {
@@ -41,7 +55,7 @@ pub fn encrypt_message(message: String, recipient_pubkey: String) -> Result<Encr
     let ephemeral_pk = PublicKey::from(&ephemeral);
     let shared = ephemeral.diffie_hellman(&recipient_pk);
 
-    let cipher = Aes256Gcm::new(shared.as_bytes().into());
+    let cipher = Aes256Gcm::new(aes_key_from_shared(&shared).into());
     let mut nonce_bytes = [0u8; 12];
     OsRng.fill_bytes(&mut nonce_bytes);
     let nonce = Nonce::from_slice(&nonce_bytes);
@@ -66,7 +80,7 @@ pub fn decrypt_message(payload: EncryptedPayload, my_secret_key_hex: String) -> 
     let eph_pk = pubkey_from_hex(&payload.ephemeral_pubkey)?;
     let shared = my_secret.diffie_hellman(&eph_pk);
 
-    let cipher = Aes256Gcm::new(shared.as_bytes().into());
+    let cipher = Aes256Gcm::new(aes_key_from_shared(&shared).into());
     let nonce_bytes = hex::decode(&payload.nonce).map_err(|e| e.to_string())?;
     let ct = hex::decode(&payload.ciphertext).map_err(|e| e.to_string())?;
 
