@@ -229,6 +229,16 @@ function App() {
       setAccountName(null)
       setPage('login')
       setInbox([])
+      // Reset auth form state so re-login defaults to the Login tab,
+      // not a stale Register tab (fixes "nickname taken" / stuck screen).
+      setAuthMode('login')
+      setNickname('')
+      setPassword('')
+      setRecoveryKey(null)
+      setRecKey('')
+      setRecNewPass('')
+      setRecMode(false)
+      setAuthError(null)
     }
   }
 
