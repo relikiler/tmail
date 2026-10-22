@@ -34,9 +34,10 @@ function App() {
   const [accountName, setAccountName] = useState<string | null>(null)
   const [lang, setLang] = useState<Lang>(() => {
     const saved = localStorage.getItem('tmail_lang') as Lang | null
-    return saved && translations[saved] ? saved : detectLang()
+    const valid = LANGS.some(l => l.code === saved) ? saved : null
+    return (valid ?? detectLang())
   })
-  const t = (k: string): string => translations[lang][k] || k
+  const t = (k: string): string => (translations[lang]?.[k]) || k
   const { toasts, error: toastError, success: toastSuccess, dismiss } = useToasts()
 
   useEffect(() => {
