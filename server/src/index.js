@@ -108,6 +108,8 @@ const app = Fastify({
 const ALLOWED_ORIGINS = [
   'https://195.209.212.237.nip.io',
   'https://app.tmail.io',
+  'https://tchainmail.cc',
+  'https://www.tchainmail.cc',
   'tauri://localhost',
   'http://tauri.localhost',
 ]
