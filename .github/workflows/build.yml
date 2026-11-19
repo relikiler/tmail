@@ -1,0 +1,98 @@
+name: Build TMAIL (Windows/macOS/Linux)
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            artifact_name: TMAIL-Windows
+            icon_check: icons/icon.ico
+          - os: macos-latest
+            artifact_name: TMAIL-macOS
+            icon_check: icons/icon.icns
+          - os: ubuntu-latest
+            artifact_name: TMAIL-Linux
+            icon_check: icons/icon.png
+
+    runs-on: ${{ matrix.os }}
+
+    env:
+      CARGO_TERM_COLOR: always
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: client/src-tauri
+
+      - name: Setup Node (22)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # ---- Linux системные зависимости (Tauri v2) ----
+      - name: Install Linux webkit deps
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential \
+            libappindicator3-dev librsvg2-dev patchelf libssl-dev \
+            libayatana-appindicator3-dev libsoup-3.0-dev \
+            libjavascriptcoregtk-4.1-dev
+
+      # ---- Проверка иконок перед сборкой (понятная ошибка) ----
+      - name: Verify bundle icons exist
+        working-directory: client/src-tauri
+        run: test -f ${{ matrix.icon_check }} && echo "icon ok: ${{ matrix.icon_check }}" || { echo "missing ${{ matrix.icon_check }}"; exit 1; }
+
+      - name: Install frontend deps
+        working-directory: client
+        run: npm install
+
+      - name: Build frontend for Tauri
+        working-directory: client
+        run: npx vite build --config vite.tauri.config.ts
+
+      - name: Install Tauri CLI
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and bundle app
+        working-directory: client
+        run: cargo tauri build
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: |
+            client/src-tauri/target/release/bundle/**/*
+            !**/uninstall.exe
+          if-no-files-found: error
+
+      # ---- Release при пуше тега v* ----
+      - name: Attach to GitHub Release (on tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: client/src-tauri/target/release/bundle/**/*
+          generate_release_notes: true
