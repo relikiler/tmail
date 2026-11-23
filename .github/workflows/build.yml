@@ -1,4 +1,4 @@
-name: Build TMAIL (Windows/macOS/Linux)
+name: Build TMAIL (desktop + Android)
 
 on:
   push:
@@ -48,6 +48,14 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Cache npm deps
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('client/package-lock.json') }}
+          restore-keys: |
+            npm-
+
       # ---- Linux системные зависимости (Tauri v2) ----
       - name: Install Linux webkit deps
         if: runner.os == 'Linux'
@@ -95,4 +103,78 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: client/src-tauri/target/release/bundle/**/*
+          generate_release_notes: true
+
+  android:
+    runs-on: ubuntu-latest
+    env:
+      CARGO_TERM_COLOR: always
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: client/src-tauri
+
+      - name: Setup Node (22)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Cache npm deps
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('client/package-lock.json') }}
+          restore-keys: |
+            npm-
+
+      - name: Install Linux webkit deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential \
+            libappindicator3-dev librsvg2-dev patchelf libssl-dev \
+            libayatana-appindicator3-dev libsoup-3.0-dev \
+            libjavascriptcoregtk-4.1-dev
+
+      - name: Setup Java (21)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install frontend deps
+        working-directory: client
+        run: npm install
+
+      - name: Install Tauri CLI
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Android APK (aarch64)
+        working-directory: client
+        run: cargo tauri android build --apk --target aarch64
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TMAIL-Android-arm64
+          path: client/src-tauri/gen/android/app/build/outputs/apk/**/*.apk
+          if-no-files-found: error
+
+      - name: Attach APK to GitHub Release (on tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: client/src-tauri/gen/android/app/build/outputs/apk/**/*.apk
           generate_release_notes: true
